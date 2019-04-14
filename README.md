@@ -15,6 +15,7 @@ Set the credentials in the environment variable directive:
 ```
 DJANGO_SECRET_KEY=blah-blah      <-- Django secret key, a random enough secrets
 DATABASE_URL=mysql:user:pass@host:port/db      <-- (Optional) The support database schemes in URLs, refer to dj_database_url
+SLACK_CLIENT_SECRET=blahblah        <-- "Client Secret" of Slack
 SLACK_OAUTH_TOKEN=blahblah      <-- OAuth Access Token of Slack, starts with xoxp-
 SLACK_VERIFICATION_TOKEN=blahblah  <-- "Verification Token" of Slack
 ```

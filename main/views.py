@@ -14,7 +14,8 @@ import math
 import re
 
 client_id = '64961225782.609226531318'
-client_secret = os.environ.get('SLACK_OAUTH_TOKEN', '')
+client_secret = os.environ.get('SLACK_CLIENT_SECRET', '')
+oauth_token = os.environ.get('SLACK_OAUTH_TOKEN', '')
 
 emoji = [
     ':zero:',
@@ -92,7 +93,7 @@ def parse_message(message):
                     vote_list.append(name_cache[name])
                 else:
                     method_url = 'https://slack.com/api/users.info'
-                    method_params = {'token': client_secret, 'user': name}
+                    method_params = {'token': oauth_token, 'user': name}
                     response_data = requests.get(method_url, params=method_params)
                     response = response_data.json()
                     res = '@' + response['user']['name']
@@ -195,7 +196,7 @@ def format_attachments(options):
 def create_dialog(payload):
     method_url = 'https://slack.com/api/dialog.open'
     method_params = {
-        'token': client_secret,
+        'token': oauth_token,
         'trigger_id': payload['trigger_id'],
         'dialog': {
             'title': 'Add an option',
@@ -249,7 +250,7 @@ def interactive_button(request):
     attachments = format_attachments(options)
     method_url = 'https://slack.com/api/chat.update'
     updated_message = {
-        'token': client_secret,
+        'token': oauth_token,
         'channel': payload['channel']['id'],
         'ts': ts,
         'text': text,
@@ -263,7 +264,7 @@ def interactive_button(request):
 def send_error_message(channel, user, msg):
     post_message_url = 'https://slack.com/api/chat.postEphemeral'
     post_message_params = {
-        'token': client_secret,
+        'token': oauth_token,
         'text': msg,
         'channel': channel,
         'user': user,
@@ -274,14 +275,14 @@ def send_error_message(channel, user, msg):
 def send_poll_message(channel, user, cmd, text, attachment):
     post_message_url = 'https://slack.com/api/chat.postMessage'
     post_message_params = {
-        'token': client_secret,
+        'token': oauth_token,
         'text': cmd,
         'channel': channel,
         'as_user': user
     }
     requests.post(post_message_url, params=post_message_params)
     post_message_params = {
-        'token': client_secret,
+        'token': oauth_token,
         'text': text,
         'channel': channel,
         'icon_url': 'https://sherlock-poll.tdf.ringier.ch/static/main/sherlockpolllogo-colors.png',
