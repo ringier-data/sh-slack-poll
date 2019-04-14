@@ -12,7 +12,7 @@ class Migration(migrations.Migration):
             fields=[
                 ('access_token', models.CharField(max_length=1000)),
                 ('team_name', models.CharField(max_length=1000)),
-                ('team_id', models.CharField(max_length=1000, primary_key=True, serialize=False)),
+                ('team_id', models.CharField(max_length=255, primary_key=True, serialize=False)),
                 ('incoming_webhook_url', models.CharField(max_length=1000)),
                 ('incoming_webhook_configuration_url', models.CharField(max_length=1000)),
                 ('last_changed', models.DateTimeField(auto_now=True)),
