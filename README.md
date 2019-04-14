@@ -20,12 +20,12 @@ SLACK_VERIFICATION_TOKEN=blahblah  <-- "Verification Token" of Slack
 ```
 
 
-Clone the repo into `/opt/sherlock-poll`, config nginx:
+Clone the repo into `/opt/sh-slack-poll`, config nginx:
 
 ```
   ...
   location /static/ {
-    root /opt/sherlock-poll/main;
+    root /opt/sh-slack-poll/main;
   }
   location / {
     include proxy_params;
@@ -58,7 +58,7 @@ After=network.target
 User=www-data
 Group=www-data
 EnvironmentFile=/etc/sherlock-poll.env
-WorkingDirectory=/opt/sherlock-poll
+WorkingDirectory=/opt/sh-slack-poll
 ExecStart=/usr/local/bin/gunicorn \
           --access-logfile - \
           --workers 3 \
