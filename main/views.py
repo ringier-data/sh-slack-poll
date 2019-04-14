@@ -92,13 +92,10 @@ def parse_message(message):
                     vote_list.append(name_cache[name])
                 else:
                     method_url = 'https://slack.com/api/users.info'
-                    method_params = {
-                        "token": client_secret,
-                        "user": name
-                    }
+                    method_params = {'token': client_secret, 'user': name}
                     response_data = requests.get(method_url, params=method_params)
                     response = response_data.json()
-                    res = '@' + response["user"]["name"]
+                    res = '@' + response['user']['name']
                     vote_list.append(res)
                     name_cache[name] = res
             votes[options[i - 1]] = vote_list
@@ -107,31 +104,27 @@ def parse_message(message):
 
 def index(request):
     state = ''.join(random.choice(string.ascii_uppercase + string.digits) for _ in range(36))
-    context = {"state": state}
-    return render(request, "main/index.html", context)
+    context = {'state': state}
+    return render(request, 'main/index.html', context)
 
 
 def oauthcallback(request):
-    if "error" in request.GET:
-        status = "Authentication failed, as the authentication process is aborted. Redirecting back to the homepage..."
-        context = {"status": status}
-        return render(request, "main/oauthcallback.html", context)
+    if 'error' in request.GET:
+        status = 'Authentication failed, as the authentication process is aborted. Redirecting back to the homepage...'
+        context = {'status': status}
+        return render(request, 'main/oauthcallback.html', context)
 
     code = request.GET["code"]
 
-    url = "https://slack.com/api/oauth.access"
-    data = {
-        "client_id": client_id,
-        "client_secret": client_secret,
-        "code": code,
-    }
+    url = 'https://slack.com/api/oauth.access'
+    data = {'client_id': client_id, 'client_secret': client_secret, 'code': code}
 
     r = requests.get(url, params=data)
     query_result = r.json()
-    if query_result["ok"]:
-        access_token = query_result["access_token"]
-        team_name = query_result["team_name"]
-        team_id = query_result["team_id"]
+    if query_result['ok']:
+        access_token = query_result['access_token']
+        team_name = query_result['team_name']
+        team_id = query_result['team_id']
 
         try:
             team = Teams.objects.get(team_id=team_id)
@@ -146,33 +139,33 @@ def oauthcallback(request):
             team.save()
 
     else:
-        status = "Oauth authentication failed. Redirecting back to the homepage..."
-        context = {"status": status}
-        return render(request, "main/oauthcallback.html", context)
+        status = 'Oauth authentication failed. Redirecting back to the homepage...'
+        context = {'status': status}
+        return render(request, 'main/oauthcallback.html', context)
 
-    status = "Oauth authentication successful! You can now start using /poll. Redirecting back to the homepage..."
-    context = {"status": status}
-    return render(request, "main/oauthcallback.html", context)
+    status = 'Oauth authentication successful! You can now start using /poll. Redirecting back to the homepage...'
+    context = {'status': status}
+    return render(request, 'main/oauthcallback.html', context)
 
 
 def check_token(request):
     verifier = os.environ.get('SLACK_VERIFICATION_TOKEN', '')
-    if request.method != "POST":
-        return HttpResponseBadRequest("400 Request should be of type POST.")
-    if "token" in request.POST:
-        sent_token = request.POST["token"]
-    elif "payload" in request.POST and "token" in json.loads(request.POST["payload"]):
-        sent_token = json.loads(request.POST["payload"])["token"]
+    if request.method != 'POST':
+        return HttpResponseBadRequest('400 Request should be of type POST.')
+    if 'token' in request.POST:
+        sent_token = request.POST['token']
+    elif 'payload' in request.POST and 'token' in json.loads(request.POST['payload']):
+        sent_token = json.loads(request.POST['payload'])['token']
     else:
-        return HttpResponseBadRequest("400 Request is not signed!")
+        return HttpResponseBadRequest('400 Request is not signed!')
 
     if verifier != sent_token:
-        return HttpResponseBadRequest("400 Request is not signed correctly!")
+        return HttpResponseBadRequest('400 Request is not signed correctly!')
     return None
 
 
 def format_text(question, options, votes):
-    text = "*" + question + "*\n\n"
+    text = '*' + question + '*\n\n'
 
     for i, option in enumerate(options):
         to_add = emoji[i] + ' '
@@ -187,13 +180,13 @@ def format_text(question, options, votes):
 def format_attachments(options):
     actions = []
     for i, option in enumerate(options):
-        attach = {"name": "option", "text": emoji[i], "type": "button", "value": option}
+        attach = {'name': 'option', 'text': emoji[i], 'type': 'button', 'value': option}
         actions.append(attach)
-    actions.append({"name": "addMore", "text": "Add option", "type": "button", "value": "Add option"})
+    actions.append({'name': 'addMore', 'text': 'Add option', 'type': 'button', 'value': 'Add option'})
     attachments = []
     for i in range(int(math.ceil(len(actions) / 5.0))):
-        attachment = {"text": "", "callback_id": "options", "attachment_type": "default",
-                      "actions": actions[5 * i: 5 * i + 5]}
+        attachment = {'text': '', 'callback_id': 'options', 'attachment_type': 'default',
+                      'actions': actions[5 * i: 5 * i + 5]}
         attachments.append(attachment)
 
     return json.dumps(attachments)
@@ -202,19 +195,17 @@ def format_attachments(options):
 def create_dialog(payload):
     method_url = 'https://slack.com/api/dialog.open'
     method_params = {
-        "token": client_secret,
-        "trigger_id": payload['trigger_id'],
-        "dialog": {
-            "title": "Add an option",
-            "state": payload['original_message']['ts'],
-            "callback_id": "newOption",
-            "elements": [{
-                "type": "text",
-                "label": "New Option",
-                "name": "new_option"
-            }]
-        }
-    }
+        'token': client_secret,
+        'trigger_id': payload['trigger_id'],
+        'dialog': {
+            'title': 'Add an option',
+            'state': payload['original_message']['ts'],
+            'callback_id': 'newOption',
+            'elements': [{
+                'type': 'text',
+                'label': 'New Option',
+                'name': 'new_option'
+            }]}}
     method_params['dialog'] = json.dumps(method_params['dialog'])
     requests.post(method_url, params=method_params)
 
@@ -225,11 +216,11 @@ def interactive_button(request):
     if error_code is not None:
         return error_code
     payload = json.loads(request.POST['payload'])
-    question = ""
+    question = ''
     options = []
     votes = defaultdict(list)
-    ts = ""
-    if payload["callback_id"] == "newOption":
+    ts = ''
+    if payload['callback_id'] == 'newOption':
         ts = payload['state']
         poll = timestamped_poll(payload['state'])
         question = poll.question
@@ -240,66 +231,66 @@ def interactive_button(request):
         options.append(payload['submission']['new_option'])
         poll.options = json.dumps(options)
         poll.save()
-    elif payload["actions"][0]["name"] == "addMore":
+    elif payload['actions'][0]['name'] == 'addMore':
         ts = payload['original_message']['ts']
         question, options, votes = parse_message(payload['original_message'])
         create_dialog(payload)
-    elif payload['actions'][0]["name"] == "option":
+    elif payload['actions'][0]['name'] == 'option':
         ts = payload['original_message']['ts']
         question, options, votes = parse_message(payload['original_message'])
-        lst = votes[payload["actions"][0]["value"]]
+        lst = votes[payload['actions'][0]['value']]
         if "@" + payload['user']['name'] in lst:
-            votes[payload["actions"][0]["value"]].remove("@" + payload['user']['name'])
+            votes[payload['actions'][0]['value']].remove('@' + payload['user']['name'])
         else:
-            votes[payload['actions'][0]['value']].append("@" + payload["user"]["name"])
+            votes[payload['actions'][0]['value']].append('@' + payload["user"]["name"])
         poll = timestamped_poll(payload['original_message']['ts'])
         update_vote(poll, payload['actions'][0]['value'], votes[payload['actions'][0]['value']])
     text = format_text(question, options, votes)
     attachments = format_attachments(options)
     method_url = 'https://slack.com/api/chat.update'
     updated_message = {
-        "token": client_secret,
-        "channel": payload['channel']['id'],
-        "ts": ts,
-        "text": text,
-        "attachments": attachments,
-        "parse": "full"
+        'token': client_secret,
+        'channel': payload['channel']['id'],
+        'ts': ts,
+        'text': text,
+        'attachments': attachments,
+        'parse': 'full'
     }
     requests.post(method_url, params=updated_message)
     return HttpResponse()
 
 
 def send_error_message(channel, user, msg):
-    post_message_url = "https://slack.com/api/chat.postEphemeral"
+    post_message_url = 'https://slack.com/api/chat.postEphemeral'
     post_message_params = {
-        "token": client_secret,
-        "text": msg,
-        "channel": channel,
-        "user": user,
+        'token': client_secret,
+        'text': msg,
+        'channel': channel,
+        'user': user,
     }
     requests.post(post_message_url, params=post_message_params)
 
 
 def send_poll_message(channel, user, cmd, text, attachment):
-    post_message_url = "https://slack.com/api/chat.postMessage"
+    post_message_url = 'https://slack.com/api/chat.postMessage'
     post_message_params = {
-        "token": client_secret,
-        "text": cmd,
-        "channel": channel,
-        "as_user": user
+        'token': client_secret,
+        'text': cmd,
+        'channel': channel,
+        'as_user': user
     }
     requests.post(post_message_url, params=post_message_params)
     post_message_params = {
-        "token": client_secret,
-        "text": text,
-        "channel": channel,
-        "icon_url": "https://sherlock-poll.tdf.ringier.ch/static/main/sherlockpolllogo-colors.png",
-        "mrkdwn": 'true',
-        "parse": 'full',
-        "attachments": attachment
+        'token': client_secret,
+        'text': text,
+        'channel': channel,
+        'icon_url': 'https://sherlock-poll.tdf.ringier.ch/static/main/sherlockpolllogo-colors.png',
+        'mrkdwn': 'true',
+        'parse': 'full',
+        'attachments': attachment
     }
     text_response = requests.post(post_message_url, params=post_message_params)
-    return text_response.json()["ts"]  # return message timestamp
+    return text_response.json()['ts']  # return message timestamp
 
 
 @csrf_exempt
@@ -308,10 +299,10 @@ def sherlock_poll(request):
     if error_code is not None:
         return error_code
 
-    channel = request.POST["channel_id"]
-    user = request.POST["user_id"]
-    data = request.POST["text"]
-    cmd = request.POST["command"] + ' ' + request.POST["text"]
+    channel = request.POST['channel_id']
+    user = request.POST['user_id']
+    data = request.POST['text']
+    cmd = request.POST['command'] + ' ' + request.POST['text']
 
     # replace the Slack auto-formatted “ ” to "
     data = data.replace(u'\u201C', '"')
@@ -320,14 +311,14 @@ def sherlock_poll(request):
     items = data.split('"')
 
     if len(items) < 4:
-        msg = "Darn - that I don't understand you. Please say: "
+        msg = 'Darn - that I don\'t understand you. Please say: '
         msg += '`/sherlock-poll "Question" "Answer 1" "Answer 2"`'
         send_error_message(channel, user, msg)
     elif len(items) < 6:
-        msg = "Darn - that normally we don't run a poll with only one option."
+        msg = 'Darn - that normally we don\'t run a poll with only one option.'
         send_error_message(channel, user, msg)
     elif len(items) > 23:
-        msg = "Darn - that you gave too many options. Please, 10 options the most."
+        msg = 'Darn - that you gave too many options. Please, 10 options the most.'
         send_error_message(channel, user, msg)
     else:
         question = items[1]
@@ -345,4 +336,4 @@ def sherlock_poll(request):
 
 
 def privacy_policy(request):
-    return render(request, "main/privacy-policy.html")
+    return render(request, 'main/privacy-policy.html')

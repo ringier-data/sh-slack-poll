@@ -3,13 +3,13 @@ from django.test import TestCase
 
 class MainViewsTestCase(TestCase):
     def test_index(self):
-        resp = self.client.get("/")
+        resp = self.client.get('/')
         self.assertEqual(resp.status_code, 200)
-        self.assertTrue("state" in resp.context)
+        self.assertTrue('state' in resp.context)
 
     def test_poll(self):
-        resp = self.client.get("/poll/")
+        resp = self.client.get('/poll/')
         self.assertEqual(resp.status_code, 400)
 
-        resp = self.client.post("/poll/")
+        resp = self.client.post('/poll/')
         self.assertEqual(resp.status_code, 400)

@@ -9,13 +9,13 @@ import dj_database_url
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = os.environ.get("DJANGO_SECRET_KEY", "wPX#Azp)P>LM*^Q,cwe4Vi4!")
+SECRET_KEY = os.environ.get('DJANGO_SECRET_KEY', '')
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = False
 DEBUG_PROPAGATE_EXCEPTIONS = DEBUG
 
-ALLOWED_HOSTS = ["sherlock-poll.tdf.ringier.ch"]
+ALLOWED_HOSTS = ['sherlock-poll.tdf.ringier.ch']
 
 # Application definition
 
