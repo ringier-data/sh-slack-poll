@@ -68,7 +68,7 @@ def parse_message(message):
     global name_cache
     #
     # parse the message into lines. lines[0] is the question, and the rest are the options
-    lines = message['text'].split('\n')
+    lines = message['attachments'][0]['pretext'].split('\n')
     lines = [line for line in lines if line != '']
 
     question = ''
@@ -178,7 +178,11 @@ def format_text(question, options, votes):
     return text
 
 
-def format_attachments(options):
+def format_attachments_no_votes(question, options):
+    return format_attachments(question, options, defaultdict(list))
+
+
+def format_attachments(question, options, votes):
     actions = []
     for i, option in enumerate(options):
         attach = {'name': 'option', 'text': emoji[i], 'type': 'button', 'value': option}
@@ -188,6 +192,8 @@ def format_attachments(options):
     for i in range(int(math.ceil(len(actions) / 5.0))):
         attachment = {'text': '', 'callback_id': 'options', 'attachment_type': 'default',
                       'actions': actions[5 * i: 5 * i + 5]}
+        if i == 0:
+            attachment['pretext'] = format_text(question, options, votes)
         attachments.append(attachment)
 
     return json.dumps(attachments)
@@ -246,14 +252,12 @@ def interactive_button(request):
             votes[payload['actions'][0]['value']].append('@' + payload["user"]["name"])
         poll = timestamped_poll(payload['original_message']['ts'])
         update_vote(poll, payload['actions'][0]['value'], votes[payload['actions'][0]['value']])
-    text = format_text(question, options, votes)
-    attachments = format_attachments(options)
+    attachments = format_attachments(question, options, votes)
     method_url = 'https://slack.com/api/chat.update'
     updated_message = {
         'token': oauth_token,
         'channel': payload['channel']['id'],
         'ts': ts,
-        'text': text,
         'attachments': attachments,
         'parse': 'full'
     }
@@ -272,7 +276,7 @@ def send_error_message(channel, user, msg):
     requests.post(post_message_url, params=post_message_params)
 
 
-def send_poll_message(channel, user, cmd, text, attachment):
+def send_poll_message(channel, user, cmd, attachment):
     post_message_url = 'https://slack.com/api/chat.postMessage'
     post_message_params = {
         'token': oauth_token,
@@ -283,7 +287,6 @@ def send_poll_message(channel, user, cmd, text, attachment):
     requests.post(post_message_url, params=post_message_params)
     post_message_params = {
         'token': oauth_token,
-        'text': text,
         'channel': channel,
         'icon_url': 'https://sherlock-poll.tdf.ringier.ch/static/main/sherlockpolllogo-colors.png',
         'mrkdwn': 'true',
@@ -328,9 +331,8 @@ def sherlock_poll(request):
             if i % 2 == 0 and i > 2:
                 options.append(items[i - 1])
         # all data ready for initial message at this point
-        text = format_text(question, options, votes=defaultdict(list))
-        attachment = format_attachments(options)
-        timestamp = send_poll_message(channel, user, cmd, text, attachment)
+        attachments = format_attachments_no_votes(question, options)
+        timestamp = send_poll_message(channel, user, cmd, attachments)
         add_poll(timestamp, channel, question, options)
 
     return HttpResponse()  # Empty 200 HTTP response, to not display any additional content in Slack
