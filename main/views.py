@@ -1,17 +1,17 @@
-from django.shortcuts import render
-from django.http import HttpResponse, HttpResponseBadRequest
-import requests
-from main.models import Teams, Polls, Votes
-from django.core.exceptions import ObjectDoesNotExist
-from django.utils import timezone
 from collections import defaultdict
-import string
-import random
+from django.core.exceptions import ObjectDoesNotExist
+from django.http import HttpResponse, HttpResponseBadRequest
+from django.shortcuts import render
+from django.utils import timezone
 from django.views.decorators.csrf import csrf_exempt
-import os
+from main.models import Teams, Polls, Votes
 import json
 import math
+import os
+import random
 import re
+import requests
+import string
 
 client_id = '64961225782.609226531318'
 client_secret = os.environ.get('SLACK_CLIENT_SECRET', '')
@@ -190,11 +190,17 @@ def format_attachments(question, options, votes):
     actions.append({'name': 'addMore', 'text': 'Add option', 'type': 'button', 'value': 'Add option'})
     attachments = []
     for i in range(int(math.ceil(len(actions) / 5.0))):
-        attachment = {'text': '', 'callback_id': 'options', 'attachment_type': 'default',
-                      'actions': actions[5 * i: 5 * i + 5]}
+        attachment = {
+            'text': '',
+            'color': '#469DDD',
+            'callback_id': 'options',
+            'attachment_type': 'default',
+            'actions': actions[5 * i: 5 * i + 5]
+        }
         if i == 0:
             attachment['pretext'] = format_text(question, options, votes)
         attachments.append(attachment)
+    attachments[-1]['footer'] = version_info()
 
     return json.dumps(attachments)
 
@@ -340,3 +346,7 @@ def sherlock_poll(request):
 
 def privacy_policy(request):
     return render(request, 'main/privacy-policy.html')
+
+
+def version_info():
+    return 'sh-slack-poll, rev{build_number}, at {build_time}'.format(build_number='11', build_time='20190415.22:37')
