@@ -200,6 +200,11 @@ def format_attachments(question, options, votes):
         if i == 0:
             attachment['pretext'] = format_text(question, options, votes)
         attachments.append(attachment)
+    attachments.append({
+        'footer': version_info(),
+        'color': '#469DDD',
+        'attachment_type': 'default'
+    })
     attachments[-1]['footer'] = version_info()
 
     return json.dumps(attachments)
@@ -349,4 +354,4 @@ def privacy_policy(request):
 
 
 def version_info():
-    return 'sh-slack-poll, rev{build_number}, at {build_time}'.format(build_number='11', build_time='20190415.22:37')
+    return 'sh-slack-poll, rev{build_number}, at {build_time}'.format(build_number='11', build_time='20190416.05:37')
