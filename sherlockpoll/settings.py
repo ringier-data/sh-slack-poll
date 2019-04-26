@@ -15,7 +15,7 @@ SECRET_KEY = os.environ.get('DJANGO_SECRET_KEY', '')
 DEBUG = False
 DEBUG_PROPAGATE_EXCEPTIONS = DEBUG
 
-ALLOWED_HOSTS = ['sherlock-poll.tdf.ringier.ch']
+ALLOWED_HOSTS = ['sherlock-poll.tdf.ringier.ch', '139.162.185.20', '2a01:7e01::f03c:91ff:fe5d:4f6c']
 
 # Application definition
 
