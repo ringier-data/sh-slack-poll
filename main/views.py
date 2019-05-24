@@ -288,7 +288,7 @@ def send_poll_message(channel, user, cmd, attachment):
         'token': oauth_token,
         'text': cmd,
         'channel': channel,
-        'as_user': user
+        'as_user': 'true'
     }
     requests.post(post_message_url, params=post_message_params)
     post_message_params = {
