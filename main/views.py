@@ -247,7 +247,11 @@ def interactive_button(request):
     elif payload['actions'][0]['name'] == 'addMore':
         ts = payload['original_message']['ts']
         question, options, votes = parse_message(payload['original_message'])
-        create_dialog(payload)
+        if len(options) >= 11:
+            msg = 'Darn - there are 11 options already. No more.'
+            send_error_message(payload['channel']['id'], payload['user']['id'], msg)
+        else:
+            create_dialog(payload)
     elif payload['actions'][0]['name'] == 'option':
         ts = payload['original_message']['ts']
         question, options, votes = parse_message(payload['original_message'])
@@ -264,7 +268,10 @@ def interactive_button(request):
         'token': oauth_token,
         'channel': payload['channel']['id'],
         'ts': ts,
+        'text': payload['original_message']['text'],
         'attachments': attachments,
+        'mrkdwn': 'true',
+        'link_names': 1,
         'parse': 'full'
     }
     requests.post(method_url, params=updated_message)
@@ -282,22 +289,18 @@ def send_error_message(channel, user, msg):
     requests.post(post_message_url, params=post_message_params)
 
 
-def send_poll_message(channel, user, cmd, attachment):
+def send_poll_message(channel, message, attachment):
     post_message_url = 'https://slack.com/api/chat.postMessage'
     post_message_params = {
         'token': oauth_token,
-        'text': cmd,
         'channel': channel,
-        'as_user': 'true'
-    }
-    requests.post(post_message_url, params=post_message_params)
-    post_message_params = {
-        'token': oauth_token,
-        'channel': channel,
+        'text': message,
         'icon_url': 'https://sherlock-poll.tdf.ringier.ch/static/main/sherlockpolllogo-colors.png',
         'mrkdwn': 'true',
+        'link_names': 1,
         'parse': 'full',
-        'attachments': attachment
+        'attachments': attachment,
+        'as_user': 'false'
     }
     text_response = requests.post(post_message_url, params=post_message_params)
     return text_response.json()['ts']  # return message timestamp
@@ -311,12 +314,13 @@ def sherlock_poll(request):
 
     channel = request.POST['channel_id']
     user = request.POST['user_id']
+    user_name = request.POST['user_name']
     data = request.POST['text']
-    cmd = request.POST['command'] + ' ' + request.POST['text']
 
     # replace the Slack auto-formatted “ ” to "
-    data = data.replace(u'\u201C', '"')
-    data = data.replace(u'\u201D', '"')
+    data = data.replace(u'\u201C', '"').replace(u'\u201D', '"')
+
+    cmd = request.POST['command'] + ' ' + data
 
     items = data.split('"')
 
@@ -327,8 +331,8 @@ def sherlock_poll(request):
     elif len(items) < 6:
         msg = 'Darn - that normally we don\'t run a poll with only one option.'
         send_error_message(channel, user, msg)
-    elif len(items) > 23:
-        msg = 'Darn - that you gave too many options. Please, 10 options the most.'
+    elif len(items) > 25:
+        msg = 'Darn - that you gave too many options. Please, 11 options the most.'
         send_error_message(channel, user, msg)
     else:
         question = items[1]
@@ -338,7 +342,8 @@ def sherlock_poll(request):
                 options.append(items[i - 1])
         # all data ready for initial message at this point
         attachments = format_attachments_no_votes(question, options)
-        timestamp = send_poll_message(channel, user, cmd, attachments)
+        msg = '{user_id} initiated a poll: {question}\n```{cmd}```'.format(user_id=user_name, question=question, cmd=cmd)
+        timestamp = send_poll_message(channel, msg, attachments)
         add_poll(timestamp, channel, question, options)
 
     return HttpResponse()  # Empty 200 HTTP response, to not display any additional content in Slack
@@ -349,4 +354,4 @@ def privacy_policy(request):
 
 
 def version_info():
-    return 'sh-slack-poll, rev{build_number} ({build_time})'.format(build_number='11', build_time='20190416.05:37')
+    return 'sh-slack-poll, rev{build_number} ({build_time})'.format(build_number='12', build_time='20190818.13:39')
