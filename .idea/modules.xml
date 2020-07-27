@@ -2,7 +2,7 @@
 <project version="4">
   <component name="ProjectModuleManager">
     <modules>
-      <module fileurl="file://$PROJECT_DIR$/.idea/sherlock-poll.iml" filepath="$PROJECT_DIR$/.idea/sherlock-poll.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/sh-slack-poll.iml" filepath="$PROJECT_DIR$/.idea/sh-slack-poll.iml" />
     </modules>
   </component>
 </project>

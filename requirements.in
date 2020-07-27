@@ -1,0 +1,11 @@
+# pip-compile --upgrade --no-header --allow-unsafe requirements.in
+# in case pip-compile is not available, do `pip install pip-tools`
+# afterwards, `pip install -r requirements.txt`
+
+dj-database-url
+django
+gunicorn
+mysqlclient
+requests
+whitenoise
+urllib3
