@@ -354,4 +354,4 @@ def privacy_policy(request):
 
 
 def version_info():
-    return 'sh-slack-poll, rev{build_number} ({build_time})'.format(build_number='14', build_time='20210213.18:52')
+    return 'sh-slack-poll, rev{build_number} ({build_time})'.format(build_number='15', build_time='20210213.21:24')
