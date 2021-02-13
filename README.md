@@ -1,11 +1,10 @@
 # Sherlock Poll
 
 Create native polls in Slack through slash command `/sherlock-poll`.
-The current lunch polling app costs 49$/month...
 
 ## Deployment
 
-Ubuntu 18 + Python 3.7 + gunicorn + MySQL
+Ubuntu 20 + Python 3.8 + gunicorn
 
 ```bash
 touch /etc/sherlock-poll.env && chmod 600 /etc/sherlock-poll.env
@@ -14,7 +13,6 @@ touch /etc/sherlock-poll.env && chmod 600 /etc/sherlock-poll.env
 Set the credentials in the environment variable directive:
 ```
 DJANGO_SECRET_KEY=blah-blah      <-- Django secret key, a random enough secrets
-DATABASE_URL=mysql:user:pass@host:port/db      <-- (Optional) The support database schemes in URLs, refer to dj_database_url
 SLACK_CLIENT_SECRET=blahblah        <-- "Client Secret" of Slack
 SLACK_OAUTH_TOKEN=blahblah      <-- OAuth Access Token of Slack, starts with xoxp-
 SLACK_VERIFICATION_TOKEN=blahblah  <-- "Verification Token" of Slack

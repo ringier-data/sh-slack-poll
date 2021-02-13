@@ -4,7 +4,6 @@ Django settings for sherlockpoll project.
 
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
 import os
-import dj_database_url
 
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
@@ -15,12 +14,11 @@ SECRET_KEY = os.environ.get('DJANGO_SECRET_KEY', '')
 DEBUG = False
 DEBUG_PROPAGATE_EXCEPTIONS = DEBUG
 
-ALLOWED_HOSTS = ['sherlock-poll.tdf.ringier.ch', '139.162.185.20', '2a01:7e01::f03c:91ff:fe5d:4f6c']
+ALLOWED_HOSTS = ['sherlock-poll.tdf.ringier.ch', '54.216.38.113', '127.0.0.1']
 
 # Application definition
 
 INSTALLED_APPS = (
-    'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
     'django.contrib.sessions',
@@ -83,11 +81,6 @@ USE_TZ = True
 STATIC_URL = '/static/'
 
 STATIC_ROOT = os.path.join(BASE_DIR, 'main/static/')
-
-# Parse database configuration from $DATABASE_URL
-config = dj_database_url.config()
-if config:
-    DATABASES['default'] = config
 
 # Honor the 'X-Forwarded-Proto' header for request.is_secure()
 SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
