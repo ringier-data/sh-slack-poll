@@ -212,7 +212,10 @@ def create_dialog(payload):
         'trigger_id': payload['trigger_id'],
         'dialog': {
             'title': 'Add an option',
-            'state': payload['original_message']['ts'],
+            'state': json.dumps({
+                'text': payload['original_message']['text'],
+                'ts': payload['original_message']['ts']
+            }),
             'callback_id': 'newOption',
             'elements': [{
                 'type': 'text',
@@ -233,9 +236,12 @@ def interactive_button(request):
     options = []
     votes = defaultdict(list)
     ts = ''
+    text = ''
     if payload['callback_id'] == 'newOption':
-        ts = payload['state']
-        poll = timestamped_poll(payload['state'])
+        state = json.loads(payload['state'])
+        ts = state['ts']
+        text = state['text']
+        poll = timestamped_poll(ts)
         question = poll.question
         options = json.loads(poll.options)
         votes_obj = get_all_votes(poll)
@@ -246,6 +252,7 @@ def interactive_button(request):
         poll.save()
     elif payload['actions'][0]['name'] == 'addMore':
         ts = payload['original_message']['ts']
+        text = payload['original_message']['text']
         question, options, votes = parse_message(payload['original_message'])
         if len(options) >= 11:
             msg = 'Darn - there are 11 options already. No more.'
@@ -254,6 +261,7 @@ def interactive_button(request):
             create_dialog(payload)
     elif payload['actions'][0]['name'] == 'option':
         ts = payload['original_message']['ts']
+        text = payload['original_message']['text']
         question, options, votes = parse_message(payload['original_message'])
         lst = votes[payload['actions'][0]['value']]
         if "@" + payload['user']['name'] in lst:
@@ -268,7 +276,7 @@ def interactive_button(request):
         'token': oauth_token,
         'channel': payload['channel']['id'],
         'ts': ts,
-        'text': payload['original_message']['text'],
+        'text': text,
         'attachments': attachments,
         'mrkdwn': 'true',
         'link_names': 1,
@@ -354,4 +362,4 @@ def privacy_policy(request):
 
 
 def version_info():
-    return 'sh-slack-poll, rev{build_number} ({build_time})'.format(build_number='15', build_time='20210213.21:24')
+    return 'sh-slack-poll, rev{build_number} ({build_time})'.format(build_number='16', build_time='20210508.16:45')
