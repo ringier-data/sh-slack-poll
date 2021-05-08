@@ -1,12 +1,12 @@
-asgiref==3.3.1
+asgiref==3.3.4
     # via django
 certifi==2020.12.5
     # via requests
 chardet==4.0.0
     # via requests
-django==3.1.6
+django==3.2.2
     # via -r requirements.in
-gunicorn==20.0.4
+gunicorn==20.1.0
     # via -r requirements.in
 idna==2.10
     # via requests
@@ -16,7 +16,7 @@ requests==2.25.1
     # via -r requirements.in
 sqlparse==0.4.1
     # via django
-urllib3==1.26.3
+urllib3==1.26.4
     # via
     #   -r requirements.in
     #   requests
@@ -24,5 +24,5 @@ whitenoise==5.2.0
     # via -r requirements.in
 
 # The following packages are considered to be unsafe in a requirements file:
-setuptools==53.0.0
+setuptools==56.1.0
     # via gunicorn
